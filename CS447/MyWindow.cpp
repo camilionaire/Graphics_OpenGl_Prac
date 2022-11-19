@@ -5,12 +5,27 @@
 #include <FL/Fl.h>
 #include <GL/GLU.h>
 
-MyWindow::MyWindow(int width, int height, const char* title) : Fl_Gl_Window(width, height, title)
-{
+void IdleCallback(void* pData) {
+
+    if (pData != NULL) {
+
+        MyWindow* pWindow = reinterpret_cast<MyWindow*>(pData);
+        if (pWindow->animating) {
+            pWindow->rotation += pWindow->rotationIncrement / 100;
+            pWindow->redraw();
+        }
+    }
+}
+
+MyWindow::MyWindow(int width, int height, const char* title) : Fl_Gl_Window(width, height, title) {
+
 	mode(FL_RGB | FL_ALPHA | FL_DEPTH | FL_DOUBLE);
 
     rotation = 0.f;
     rotationIncrement = 10.f;
+    animating = false;
+
+    Fl::add_idle(IdleCallback, this);
 }
 
 MyWindow::~MyWindow()
@@ -117,6 +132,10 @@ int MyWindow::handle(int event)
         case FL_Right:
             rotation += rotationIncrement;
             redraw();
+            return 1;
+
+        case ' ':
+            animating = !animating;
             return 1;
         }
     }
