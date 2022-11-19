@@ -35,6 +35,14 @@ void MyWindow::InitializeGL() {
 
 	glClearColor(.1f, .1f, .1f, 1);
 	glEnable(GL_DEPTH_TEST);
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    float lightColor[4] = { 1, 1, 1, 1 };
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
+
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
 }
 
 void MyWindow::draw() {
@@ -55,6 +63,10 @@ void MyWindow::draw() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(0, 0, 3, 0, 0, 0, 0, 1, 0);
+
+    float lightPosition[4] = { 5, 5, 5, 1 };
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+
     // takes the angle to rotate (degrees) and axis to rotate around (pos y)
     glRotatef(rotation, 0, 1, 0);
 
@@ -68,6 +80,7 @@ void MyWindow::DrawCube()
 {
     glBegin(GL_QUADS);
     // front
+    glNormal3f(0, 0, 1);
     glColor3f(1, 0, 0);
     glVertex3f(-1, 1, 1);
     glVertex3f(-1, -1, 1);
@@ -75,6 +88,7 @@ void MyWindow::DrawCube()
     glVertex3f(1, 1, 1);
 
     // back
+    glNormal3f(0, 0, -1);
     glColor3f(0, 1, 0);
     glVertex3f(-1, 1, -1);
     glVertex3f(1, 1, -1);
@@ -82,6 +96,7 @@ void MyWindow::DrawCube()
     glVertex3f(-1, -1, -1);
 
     // top
+    glNormal3f(0, 1, 0);
     glColor3f(0, 0, 1);
     glVertex3f(-1, 1, -1);
     glVertex3f(-1, 1, 1);
@@ -89,6 +104,7 @@ void MyWindow::DrawCube()
     glVertex3f(1, 1, -1);
 
     // bottom
+    glNormal3f(0, -1, 0);
     glColor3f(1, 1, 0);
     glVertex3f(-1, -1, -1);
     glVertex3f(1, -1, -1);
@@ -96,6 +112,7 @@ void MyWindow::DrawCube()
     glVertex3f(-1, -1, 1);
 
     // left
+    glNormal3f(-1, 0, 0);
     glColor3f(0, 1, 1);
     glVertex3f(-1, 1, -1);
     glVertex3f(-1, -1, -1);
@@ -103,6 +120,7 @@ void MyWindow::DrawCube()
     glVertex3f(-1, 1, 1);
 
     // right
+    glNormal3f(1, 0, 0);
     glColor3f(1, 0, 1);
     glVertex3f(1, 1, 1);
     glVertex3f(1, -1, 1);
