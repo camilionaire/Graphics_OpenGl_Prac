@@ -11,6 +11,11 @@ class MyWindow : public Fl_Gl_Window
       void InitializeGL();
       virtual void draw();
       void DrawCube();
+      virtual int handle(int event);
+
+      float rotation;
+      float rotationIncrement;
+      bool animating;
 };
 
 #endif

@@ -2,11 +2,15 @@
 #include "MyWindow.h"
 
 #include <FL/Gl.h>
+#include <FL/Fl.h>
 #include <GL/GLU.h>
 
 MyWindow::MyWindow(int width, int height, const char* title) : Fl_Gl_Window(width, height, title)
 {
 	mode(FL_RGB | FL_ALPHA | FL_DEPTH | FL_DOUBLE);
+
+    rotation = 0.f;
+    rotationIncrement = 10.f;
 }
 
 MyWindow::~MyWindow()
@@ -36,6 +40,8 @@ void MyWindow::draw() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(0, 0, 3, 0, 0, 0, 0, 1, 0);
+    // takes the angle to rotate (degrees) and axis to rotate around (pos y)
+    glRotatef(rotation, 0, 1, 0);
 
 	// draw something
     DrawCube();
@@ -90,5 +96,32 @@ void MyWindow::DrawCube()
     glEnd();
 }
 
+int MyWindow::handle(int event)
+{
+    switch (event)
+    {
+    // makes sure all keyboard events are sent to window
+    case FL_FOCUS:
+    case FL_UNFOCUS:
+        return 1;
+
+    case FL_KEYBOARD:
+        int key = Fl::event_key();
+        switch (key)
+        {
+        case FL_Left:
+            rotation -= rotationIncrement;
+            redraw();
+            return 1;
+
+        case FL_Right:
+            rotation += rotationIncrement;
+            redraw();
+            return 1;
+        }
+    }
+
+    return Fl_Gl_Window::handle(event);
+}
 
 
