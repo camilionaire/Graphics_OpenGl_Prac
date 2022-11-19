@@ -10,6 +10,7 @@ class MyWindow : public Fl_Gl_Window
       virtual ~MyWindow();
       void InitializeGL();
       virtual void draw();
+      void DrawCube();
 };
 
 #endif
