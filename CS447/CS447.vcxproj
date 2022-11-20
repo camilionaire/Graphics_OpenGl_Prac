@@ -90,11 +90,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="libtarga.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyWindow.cpp" />
+    <ClCompile Include="TargaImage.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="libtarga.h" />
     <ClInclude Include="MyWindow.h" />
+    <ClInclude Include="TargaImage.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="graphics.tga" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

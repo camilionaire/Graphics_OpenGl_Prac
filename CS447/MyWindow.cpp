@@ -4,6 +4,8 @@
 #include <FL/Gl.h>
 #include <FL/Fl.h>
 #include <GL/GLU.h>
+#include <iostream>
+#include <math.h>
 
 void IdleCallback(void* pData) {
 
@@ -43,6 +45,10 @@ void MyWindow::InitializeGL() {
 
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
+
+    glEnable(GL_TEXTURE_2D);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    LoadTexture("graphics.tga");
 }
 
 void MyWindow::draw() {
@@ -76,58 +82,60 @@ void MyWindow::draw() {
 }
 
 // just copied and pasted this so we'll see...
+// copied and pasted second time... dunno.
 void MyWindow::DrawCube()
 {
     glBegin(GL_QUADS);
     // front
     glNormal3f(0, 0, 1);
     glColor3f(1, 0, 0);
-    glVertex3f(-1, 1, 1);
-    glVertex3f(-1, -1, 1);
-    glVertex3f(1, -1, 1);
-    glVertex3f(1, 1, 1);
+    glTexCoord2f(0, 1);      glVertex3f(-1, 1, 1);
+    glTexCoord2f(0, 0);      glVertex3f(-1, -1, 1);
+    glTexCoord2f(1, 0);      glVertex3f(1, -1, 1);
+    glTexCoord2f(1, 1);      glVertex3f(1, 1, 1);
 
     // back
     glNormal3f(0, 0, -1);
     glColor3f(0, 1, 0);
-    glVertex3f(-1, 1, -1);
-    glVertex3f(1, 1, -1);
-    glVertex3f(1, -1, -1);
-    glVertex3f(-1, -1, -1);
+    glTexCoord2f(1, 1);      glVertex3f(-1, 1, -1);
+    glTexCoord2f(0, 1);      glVertex3f(1, 1, -1);
+    glTexCoord2f(0, 0);      glVertex3f(1, -1, -1);
+    glTexCoord2f(1, 0);      glVertex3f(-1, -1, -1);
 
     // top
     glNormal3f(0, 1, 0);
     glColor3f(0, 0, 1);
-    glVertex3f(-1, 1, -1);
-    glVertex3f(-1, 1, 1);
-    glVertex3f(1, 1, 1);
-    glVertex3f(1, 1, -1);
+    glTexCoord2f(0, 1);      glVertex3f(-1, 1, -1);
+    glTexCoord2f(0, 0);      glVertex3f(-1, 1, 1);
+    glTexCoord2f(1, 0);      glVertex3f(1, 1, 1);
+    glTexCoord2f(1, 1);      glVertex3f(1, 1, -1);
 
     // bottom
     glNormal3f(0, -1, 0);
     glColor3f(1, 1, 0);
-    glVertex3f(-1, -1, -1);
-    glVertex3f(1, -1, -1);
-    glVertex3f(1, -1, 1);
-    glVertex3f(-1, -1, 1);
+    glTexCoord2f(0, 0);      glVertex3f(-1, -1, -1);
+    glTexCoord2f(1, 0);      glVertex3f(1, -1, -1);
+    glTexCoord2f(1, 1);      glVertex3f(1, -1, 1);
+    glTexCoord2f(0, 1);      glVertex3f(-1, -1, 1);
 
     // left
     glNormal3f(-1, 0, 0);
     glColor3f(0, 1, 1);
-    glVertex3f(-1, 1, -1);
-    glVertex3f(-1, -1, -1);
-    glVertex3f(-1, -1, 1);
-    glVertex3f(-1, 1, 1);
+    glTexCoord2f(0, 1);      glVertex3f(-1, 1, -1);
+    glTexCoord2f(0, 0);      glVertex3f(-1, -1, -1);
+    glTexCoord2f(1, 0);      glVertex3f(-1, -1, 1);
+    glTexCoord2f(1, 1);      glVertex3f(-1, 1, 1);
 
     // right
     glNormal3f(1, 0, 0);
     glColor3f(1, 0, 1);
-    glVertex3f(1, 1, 1);
-    glVertex3f(1, -1, 1);
-    glVertex3f(1, -1, -1);
-    glVertex3f(1, 1, -1);
+    glTexCoord2f(0, 1);      glVertex3f(1, 1, 1);
+    glTexCoord2f(0, 0);      glVertex3f(1, -1, 1);
+    glTexCoord2f(1, 0);      glVertex3f(1, -1, -1);
+    glTexCoord2f(1, 1);      glVertex3f(1, 1, -1);
     glEnd();
 }
+
 
 int MyWindow::handle(int event)
 {
@@ -160,5 +168,65 @@ int MyWindow::handle(int event)
 
     return Fl_Gl_Window::handle(event);
 }
+
+void MyWindow::LoadTexture(const char* filename)
+{
+    TargaImage* image = TargaImage::Load_Image((char*)filename);
+    if (!image)
+    {
+        std::cerr << "Failed to load texture:  " << filename << std::endl;
+        return;
+    }
+
+    // reverse the row order
+    TargaImage* reversedImage = image->Reverse_Rows();
+    delete image;
+    image = reversedImage;
+
+    if (!ResizeImage(image))
+    {
+        std::cerr << "Failed to resize texture." << std::endl;
+        return;
+    }
+
+    glGenTextures(1, &textureId);
+    glBindTexture(GL_TEXTURE_2D, textureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->width, image->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image->data);
+}
+
+
+// just cpied and pasted this from the instructions...
+bool MyWindow::ResizeImage(TargaImage* image)
+{
+    int newWidth = pow(2.0, (int)ceil(log((float)image->width) / log(2.f)));
+    int newHeight = pow(2.0, (int)ceil(log((float)image->width) / log(2.f)));
+
+    newWidth = max(64, newWidth);
+    newHeight = max(64, newHeight);
+
+    if (newWidth != image->width && newHeight != image->height)
+    {
+        unsigned char* scaledData = new unsigned char[newWidth * newHeight * 4];
+        if (gluScaleImage(GL_RGBA, image->width, image->height, GL_UNSIGNED_BYTE, image->data, newWidth, newHeight, GL_UNSIGNED_BYTE, scaledData) != 0)
+        {
+            delete[] scaledData;
+            return false;
+        }// if
+
+        delete image->data;
+        image->data = scaledData;
+        image->width = newWidth;
+        image->height = newHeight;
+    }// if
+
+    return true;
+}
+
+
 
 

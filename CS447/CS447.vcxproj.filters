@@ -21,10 +21,27 @@
     <ClCompile Include="MyWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TargaImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libtarga.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="libtarga.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TargaImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="graphics.tga">
+      <Filter>Source Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
